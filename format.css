@@ -1,0 +1,13 @@
+/* 定义callout类的样式
+配色的HEX码在https://www.sojson.com/web/panel.html获得
+*/  
+.callout {  
+    background-color: rgba(242, 244, 244, 0.5); /* 设置背景颜色为米黄色 */  
+    color: black; /* 设置文字颜色为黑色 */  
+    padding: 20px; /* 设置内边距 */  
+    border: 1px solid #ccc; /* 可选：设置边框，颜色为浅灰色，增强视觉分隔 */  
+    margin: 10px; /* 设置外边距 */  
+    border-radius: 5px; /* 设置边框圆角，使边角柔和 */  
+    /* 你可以在这里添加更多的CSS样式来进一步美化你的框 */  
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 可选：添加轻微的阴影效果，增强立体感 */  
+}
