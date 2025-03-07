@@ -20,7 +20,7 @@ cache = torch.stack( [torch.cos(idx_theta), torch.sin(idx_theta)], dim=-1)
 
 # 2 应用
 ## 2.1 输入reshape
-xshaped = X.reshape( batch_size, num_heads, seq_len, qk_dim // 2)
+xshaped = X.reshape( batch_size, num_heads, seq_len, qk_dim // 2, 2)
 ## 2.2 编码量reshape
 rope_cache.reshape( 1, 1, seq_len, qk_dim // 2, 2 )
 ## 2.3 旋转
@@ -94,6 +94,7 @@ $$
 上式的核心在于对编码后的偶数位使用-sin。但实现层面目前主流的旋转对象是对嵌入维度整体对半旋转（i和d/2+i一对）。前者的实现有GLM，后者有Llama和Mistral。
 
 ## 2.1 相邻维度成对旋转
+
 <p align="center">
   <img src="images/rotary_正常.png" width=60%><br>
 </p>

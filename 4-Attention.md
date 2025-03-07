@@ -59,22 +59,23 @@ import torch.nn.functional as F
 from typing import List, Optional, Tuple
 
 class MultiHeadAttention( nn.Module ):
-    """多头注意力，qkv三者维度被均分为num_heads个部分，增强并行能力和表示能力，更鲁棒"""
+    """多头注意力，qkv三者维度被均分为num_heads个部分，增强并行能力和表示能力，更鲁棒
+    原则上，QK维度需要一致，V维度可以不一致，但实际上，QKV三者的维度均一致，统称为head_dim
+    原则上，head_dim可以指定，且head_dim*num_heads可以不等于hidden_size，但通常都是一致的
+    """
     def __init__( self, config: XXXConfig):
         super().__init__()
         # config参数内化：头数、维度等
         self.num_heads = config.num_heads      # 头数，即qkv的维度被均分为多少部分
         self.hidden_dim = config.hidden_dim    # 嵌入维度embedding_dim，即输入向量的最后一个维度
-        self.qk_dim = config.qk_dim            # query和key投影矩阵的维度，两者需要点积因此维度必须一致，可以任意，但通常简化为与hidden_dim一致。
-        self.v_dim = config.v_dim              # value投影矩阵的维度，可以与qk和hidden_dim不一致，但通常简化为与hidden_dim一致，如Baichuan2-7B就是三者都等于hidden_dim
         self.head_dim = self.hidden_dim // self.num_heads       # 也有直接设置为config.kv_channels指定的，如chatglm3-6b
         assert self.head_dim * self.num_heads == hidden_dim , "Embedding size must be divisible by num_heads"
 
         # 投影矩阵组件：下面三个投影矩阵可以写为一个self.W_pack，要用时再拆分
-        self.query_linear = nn.Linear( self.hidden_dim, self.qk_dim )
-        self.key_linear = nn.Linear( self.hidden_dim, self.qk_dim )
-        self.value_linear = nn.Linear( self.hidden_dim, self.v_dim )
-        self.out_linear = nn.Linear( self.v_dim, self.hidden_dim)
+        self.query_linear = nn.Linear( self.hidden_dim, self.hidden_dim )
+        self.key_linear = nn.Linear( self.hidden_dim, self.hidden_dim )
+        self.value_linear = nn.Linear( self.hidden_dim, self.hidden_dim )   # MQA和GQA的输出维度一般都不是self.head_dim * self.num_heads，而是乘以组数
+        self.out_linear = nn.Linear( self.hidden_dim, self.hidden_dim)
 
         # 旋转位置编码组件
         self.max_position_embeddings = config.max_position_embeddings
