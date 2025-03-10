@@ -250,11 +250,7 @@ vLLM的核心技术，借鉴操作系统内存Page命中和清退逻辑，将注
 同时，MLA需要修改RoPE的使用，因为通过低秩压缩后的$k_t = RW^{UK}c_j^{KV}$，此时与$q_t^T=q_t^CR_t^T$做矩阵乘法时$q_t^CR_t^T RW^{UK}c_j^{KV}$，位置信息与作用到$W^{UK}$矩阵上而非$c_j^{KV}$上（矩阵乘法不满足交换律），因此需要将k的计算解耦，将k分为带RoPE的部分和不带的部分，分别进行计算。https://zhuanlan.zhihu.com/p/15153745590
 
 主要思路：
-
-<p align="center">
-  <img src="images/MLA.jpg" width=80%><br>
-</p>
-
+![[images/MLA.jpg]]
 
 ### 5.3.1 对KV进行低秩联合压缩
 用两个矩阵W进行线性变换，$W^{KR}$对$h_t$进行非压缩的变换用于RoPE生成$k_t^R$；$W^{DKV}$对$h_t$进行压缩的变换生成隐向量$c_t^{KV}$，再解压缩得到$k_t^C$和$v_t^C$。
